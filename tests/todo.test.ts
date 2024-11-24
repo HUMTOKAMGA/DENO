@@ -1,63 +1,51 @@
+// todo.service.test.ts
 import { assertEquals } from "https://deno.land/std@0.224.0/testing/asserts.ts";
-import { Db, MongoClient } from "npm:mongodb@6.1.0";
 import { Todo } from "../src/models/todo.model.ts";
-
-let db: Db | null = null;
-const client = new MongoClient("mongodb://127.0.0.1:27017");
-await client.connect();
-db = client.db("todoTest");
-const todos = db.collection<Todo>("todos");
+import {
+  createTodo,
+  deleteTodo,
+  getTodo,
+  updateTodo,
+} from "../src/services/todo.service.ts";
+import { MockCollection } from "./mockCollection.ts";
 
 Deno.test({
-  name: "createTodo ajoute un Todo à la base de données",
+  name: "createTodo adds a Todo to the mock collection",
   async fn() {
-    const todo: Todo = { id: "20", task: "Test Todo", completed: false };
-    await todos.insertOne(todo);
-    const savedTodo = await todos.findOne({ id: "20" });
+    const mockCollection = new MockCollection();
+    const todo: Todo = { id: "1", task: "Test Todo", completed: false };
+    await createTodo(todo, mockCollection);
+    const savedTodo = await getTodo("1", mockCollection);
     assertEquals(savedTodo?.task, "Test Todo");
-    await client.close();
   },
   sanitizeResources: false, // Disable resource sanitization for this test
   sanitizeOps: false, // Disable async operation sanitization for this test
 });
 
 Deno.test({
-  name: "getTodo récupère un Todo existant",
+  name: "updateTodo updates a Todo in the mock collection",
   async fn() {
-    await client.connect();
-    const todo = await todos.findOne({ id: "20" });
-    assertEquals(todo?.id, "20");
-    await client.close();
-  },
-  sanitizeResources: false, // Disable resource sanitization for this test
-  sanitizeOps: false, // Disable async operation sanitization for this test
-});
-
-Deno.test({
-  name: "updateTodo met à jour les champs spécifiés d'un Todo",
-  async fn() {
-    await client.connect();
+    const mockCollection = new MockCollection();
+    const todo: Todo = { id: "1", task: "Test Todo", completed: false };
+    await createTodo(todo, mockCollection);
     const updates = { task: "Updated Title" };
-    const { modifiedCount } = await todos.updateOne(
-      { id: "20" },
-      { $set: updates }
-    );
-    assertEquals(modifiedCount > 0, true);
-    const updatedTodo = await todos.findOne({ id: "20" });
+    const result = await updateTodo("1", updates, mockCollection);
+    assertEquals(result, true);
+    const updatedTodo = await getTodo("1", mockCollection);
     assertEquals(updatedTodo?.task, "Updated Title");
-    await client.close();
   },
   sanitizeResources: false, // Disable resource sanitization for this test
   sanitizeOps: false, // Disable async operation sanitization for this test
 });
 
 Deno.test({
-  name: "deleteTodo supprime un Todo de la base de données",
+  name: "deleteTodo removes a Todo from the mock collection",
   async fn() {
-    await client.connect();
-    const result = await todos.deleteOne({ id: "20" });
-    assertEquals(result.deletedCount === 1, true);
-    await client.close();
+    const mockCollection = new MockCollection();
+    const todo: Todo = { id: "1", task: "Test Todo", completed: false };
+    await createTodo(todo, mockCollection);
+    const result = await deleteTodo("1", mockCollection);
+    assertEquals(result, true);
   },
   sanitizeResources: false, // Disable resource sanitization for this test
   sanitizeOps: false, // Disable async operation sanitization for this test
