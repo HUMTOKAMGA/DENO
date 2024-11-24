@@ -7,10 +7,7 @@ await connect();
 const db = getDb();
 const todos = db.collection<Todo>("todos");
 
-export const createTodo = async (
-  todo: Todo,
-  collection: any = null
-): Promise<Todo> => {
+export const createTodo = async (todo: Todo): Promise<Todo> => {
   logger.debug(`Tentative de création du Todo avec l'ID : ${todo.id}`);
   const newTodo: Todo = todo;
   await todos.insertOne(newTodo);
@@ -18,10 +15,7 @@ export const createTodo = async (
   return newTodo;
 };
 
-export const getTodo = async (
-  id: string,
-  collection: any = null
-): Promise<Todo | null> => {
+export const getTodo = async (id: string): Promise<Todo | null> => {
   logger.debug(`Recherche du Todo avec l'ID : ${id}`);
   const todo = await todos.findOne({ id: id });
   if (todo) {
@@ -41,8 +35,7 @@ export const getTodos = async (): Promise<Array<Todo>> => {
 
 export const updateTodo = async (
   id: string,
-  updates: Partial<Todo>,
-  collection: any = null
+  updates: Partial<Todo>
 ): Promise<boolean> => {
   logger.debug(`Tentative de mise à jour du Todo avec l'ID : ${id}`);
   const { modifiedCount } = await todos.updateOne(
@@ -58,10 +51,7 @@ export const updateTodo = async (
   }
 };
 
-export const deleteTodo = async (
-  id: string,
-  collection: any = null
-): Promise<boolean> => {
+export const deleteTodo = async (id: string): Promise<boolean> => {
   logger.debug(`Tentative de suppression du Todo avec l'ID : ${id}`);
   const result = await todos.deleteOne({ id: id });
   if (result.deletedCount === 1) {

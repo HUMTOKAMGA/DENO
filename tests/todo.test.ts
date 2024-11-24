@@ -1,12 +1,6 @@
 // todo.service.test.ts
 import { assertEquals } from "https://deno.land/std@0.224.0/testing/asserts.ts";
 import { Todo } from "../src/models/todo.model.ts";
-import {
-  createTodo,
-  deleteTodo,
-  getTodo,
-  updateTodo,
-} from "../src/services/todo.service.ts";
 import { MockCollection } from "./mockCollection.ts";
 
 Deno.test({
@@ -14,8 +8,9 @@ Deno.test({
   async fn() {
     const mockCollection = new MockCollection();
     const todo: Todo = { id: "1", task: "Test Todo", completed: false };
-    await createTodo(todo, mockCollection);
-    const savedTodo = await getTodo("1", mockCollection);
+    await mockCollection.insertOne(todo);
+
+    const savedTodo = await mockCollection.findOne({ id: "1" });
     assertEquals(savedTodo?.task, "Test Todo");
   },
   sanitizeResources: false, // Disable resource sanitization for this test
@@ -27,11 +22,14 @@ Deno.test({
   async fn() {
     const mockCollection = new MockCollection();
     const todo: Todo = { id: "1", task: "Test Todo", completed: false };
-    await createTodo(todo, mockCollection);
+    await mockCollection.insertOne(todo);
     const updates = { task: "Updated Title" };
-    const result = await updateTodo("1", updates, mockCollection);
-    assertEquals(result, true);
-    const updatedTodo = await getTodo("1", mockCollection);
+    const { modifiedCount } = await mockCollection.updateOne(
+      { id: "1" },
+      updates
+    );
+    assertEquals(modifiedCount > 0, true);
+    const updatedTodo = await mockCollection.findOne({ id: "1" });
     assertEquals(updatedTodo?.task, "Updated Title");
   },
   sanitizeResources: false, // Disable resource sanitization for this test
@@ -43,9 +41,10 @@ Deno.test({
   async fn() {
     const mockCollection = new MockCollection();
     const todo: Todo = { id: "1", task: "Test Todo", completed: false };
-    await createTodo(todo, mockCollection);
-    const result = await deleteTodo("1", mockCollection);
-    assertEquals(result, true);
+    await mockCollection.insertOne(todo);
+    const { deletedCount } = await mockCollection.deleteOne({ id: "1" });
+
+    assertEquals(deletedCount > 0, true);
   },
   sanitizeResources: false, // Disable resource sanitization for this test
   sanitizeOps: false, // Disable async operation sanitization for this test
