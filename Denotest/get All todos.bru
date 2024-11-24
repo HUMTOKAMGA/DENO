@@ -1,0 +1,19 @@
+meta {
+  name: get All todos
+  type: http
+  seq: 6
+}
+
+get {
+  url: http://localhost:8000/api/todos
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "id": "1",
+    "task": "J'aprends deno",
+    "completed": true
+  }
+}

@@ -1,0 +1,19 @@
+meta {
+  name: newTodo
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:8000/api/todo
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "id": "2",
+    "task": "Je viens de terminer la liste de todo",
+    "completed": true
+  }
+}

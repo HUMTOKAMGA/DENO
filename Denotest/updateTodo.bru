@@ -1,0 +1,19 @@
+meta {
+  name: updateTodo
+  type: http
+  seq: 4
+}
+
+put {
+  url: http://localhost:8000/api/todo/1
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "id": "2",
+    "task": "Ceci est le deuxième todo qui a été modifié",
+    "completed": true
+  }
+}

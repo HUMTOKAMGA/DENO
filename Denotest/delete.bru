@@ -1,0 +1,19 @@
+meta {
+  name: delete
+  type: http
+  seq: 5
+}
+
+delete {
+  url: http://localhost:8000/api/todo/3
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "id": "1",
+    "task": "J'aprends deno",
+    "completed": true
+  }
+}
