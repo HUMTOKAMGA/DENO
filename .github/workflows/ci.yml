@@ -21,8 +21,11 @@ jobs:
         with:
           deno-version: v1.x
 
+      - name: Upgrade Deno
+        run: deno upgrade
+
       - name: Install dependencies
-        run: deno cache src/app.ts
+        run: deno task cache
 
       - name: Run tests
         run: deno test --allow-net --allow-env
